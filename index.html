@@ -109,109 +109,80 @@
   <!-- Calculator Page -->
   <div id="calculatorPage" class="page active">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            margin: auto;
-        }
-        h2 {
-            color: white;
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .btn {
-            background-color: #28a745;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .btn:hover {
-            background-color: #218838;
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 18px;
-            color: white;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+        input { width: 100%; padding: 8px; margin: 5px 0; }
+        button { padding: 10px; margin-top: 10px; cursor: pointer; }
+        .result { margin-top: 20px; font-weight: bold; }
     </style>
-    <script>
-        function calculateProfit() {
-            let charcoalBags = parseFloat(document.getElementById('charcoalBags').value);
-            let unitPriceCharcoal = parseFloat(document.getElementById('unitPriceCharcoal').value);
-            let unitPriceGas = parseFloat(document.getElementById('unitPriceGas').value);
-            let stovePrice = parseFloat(document.getElementById('stovePrice').value);
-            
-            if (isNaN(charcoalBags) || isNaN(unitPriceCharcoal) || isNaN(unitPriceGas)) {
-                alert("Please enter valid numbers.");
-                return;
-            }
-
-            let weeklyRevenue = charcoalBags * unitPriceCharcoal;
-            let equivalentGasUnits = charcoalBags / 2;
-            let weeklyGasCost = equivalentGasUnits * unitPriceGas;
-            let weeklyProfit = weeklyRevenue - weeklyGasCost;
-            
-            let monthlyProfit = weeklyProfit * 4;
-            let sixMonthsProfit = monthlyProfit * 6;
-            let yearlyProfit = weeklyProfit * 52;
-            let twoYearsProfit = yearlyProfit * 2;
-            let threeYearsProfit = yearlyProfit * 3;
-            
-            document.getElementById('weeklyProfit').innerText = "Weekly Savings: GHS " + weeklyProfit.toFixed(2);
-            document.getElementById('monthlyProfit').innerText = "Monthly Savings: GHS " + monthlyProfit.toFixed(2);
-            document.getElementById('yearlyProfit').innerText = "Yearly Savings: GHS " + yearlyProfit.toFixed(2);
-          
-            if (!isNaN(stovePrice)) {
-                let sixMonthsAfterDeduction = sixMonthsProfit - stovePrice;
-                document.getElementById('sixMonthsAfterDeduction').innerText = "Six Months Profit (after stove cost): GHS " + sixMonthsAfterDeduction.toFixed(2);
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="container">
-        <h2>Savings Calculator</h2>
-        <label>Number of Charcoal Bags per Week:</label>
-        <input type="number" id="charcoalBags" />
-        
-        <label>Unit Price per Charcoal Bag (GHS):</label>
-        <input type="number" id="unitPriceCharcoal" />
-        
-        <label>Unit Price of Gas (GHS):</label>
-        <input type="number" id="unitPriceGas" />
-        
-        <label>Stove Price (GHS):</label>
-        <input type="number" id="stovePrice" />
-        
-        <button class="btn" onclick="calculateProfit()">Calculate Profit</button>
-        
-        <hr><div class="result" id="weeklyProfit">Weekly Saving: </div>
-        <div class="result" id="monthlyProfit">Monthly Saving: </div>
-        <div class="result" id="yearlyProfit">Yearly Saving: </div>
-        <div class="result" id="sixMonthsAfterDeduction">Six Months Saving (after stove cost): </div><hr>
+        <h2>Charcoal vs Gas Savings Calculator</h2>
+        <label for="bags">Bags of Charcoal per Week:</label>
+        <input type="number" id="bags" placeholder="Enter number of bags">
+
+        <label for="charcoalPrice">Unit Price of Charcoal:</label>
+        <input type="number" id="charcoalPrice" placeholder="Enter price per bag">
+
+        <label for="gasPrice">Unit Price of Gas:</label>
+        <input type="number" id="gasPrice" placeholder="Enter price per gas bottle">
+
+        <label for="stovePrice">Stove Package Price:</label>
+        <input type="number" id="stovePrice" placeholder="Enter stove package price">
+
+        <button onclick="calculateSavings()">Calculate Savings</button>
+
+        <div class="result" id="savingsResult"></div>
     </div>
+
+    <script>
+        function calculateSavings() {
+            let bagsPerWeek = parseFloat(document.getElementById('bags').value);
+            let charcoalPrice = parseFloat(document.getElementById('charcoalPrice').value);
+            let gasPrice = parseFloat(document.getElementById('gasPrice').value);
+            let stovePrice = parseFloat(document.getElementById('stovePrice').value);
+
+            if (isNaN(bagsPerWeek) || isNaN(charcoalPrice) || isNaN(gasPrice) || isNaN(stovePrice)) {
+                alert("Please enter valid numbers");
+                return;
+            }
+
+            // Charcoal cost calculations
+            let weeklyCharcoalCost = bagsPerWeek * charcoalPrice;
+            let monthlyCharcoalCost = weeklyCharcoalCost * 4;
+            let sixMonthsCharcoalCost = monthlyCharcoalCost * 6;
+            let yearlyCharcoalCost = monthlyCharcoalCost * 12;
+
+            // Gas cost calculations
+            let weeklyGasCost = (bagsPerWeek / 2) * gasPrice;
+            let monthlyGasCost = weeklyGasCost * 4;
+            let sixMonthsGasCost = monthlyGasCost * 6;
+            let yearlyGasCost = monthlyGasCost * 12;
+
+            // Savings calculations
+            let weeklySavings = weeklyCharcoalCost - weeklyGasCost;
+            let monthlySavings = monthlyCharcoalCost - monthlyGasCost;
+            let sixMonthsSavings = sixMonthsCharcoalCost - sixMonthsGasCost;
+            let yearlySavings = yearlyCharcoalCost - yearlyGasCost;
+
+            let weeklySavingsAfterStove = weeklySavings - (stovePrice / 52);
+            let monthlySavingsAfterStove = monthlySavings - (stovePrice / 12);
+            let sixMonthsSavingsAfterStove = sixMonthsSavings - stovePrice;
+            let yearlySavingsAfterStove = yearlySavings - stovePrice;
+
+            document.getElementById('savingsResult').innerHTML = `<hr><h3><b>Savings Without Stove Price</b></h3>
+                Weekly Savings : GHS ${weeklySavings.toFixed(2)}<br>
+                Monthly Savings : GHS ${monthlySavings.toFixed(2)}<br>
+                6-Month Savings : GHS ${sixMonthsSavings.toFixed(2)}<br>
+                Yearly Savings : GHS ${yearlySavings.toFixed(2)}<br><hr><h3><b>Savings With Stove Price</b></h3>
+                Weekly Savings : GHS ${weeklySavingsAfterStove.toFixed(2)}<br>
+                Monthly Savings : GHS ${monthlySavingsAfterStove.toFixed(2)}<br>
+                6-Month Savings : GHS ${sixMonthsSavingsAfterStove.toFixed(2)}<br>
+                Yearly Savings : GHS ${yearlySavingsAfterStove.toFixed(2)}
+            `;
+        }
+    </script>
   </div>
 
   <!-- Payment Info Page -->
