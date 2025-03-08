@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Stove Price & Calculator">
+  <link rel="apple-touch-icon" href="icon-192x192.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log("Service Worker Registered"))
+        .catch(err => console.log("Service Worker Failed", err));
+    }
+  </script>  
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px;
+    }
+    h2 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .page {
+      display: none;
+      width: 100%;
+      max-width: 500px;
+    }
+    .active {
+      display: block;
+    }
+    .calculator {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .display {
+      background-color: #eaeaea;
+      color: #333;
+      padding: 15px;
+      font-size: 18px;
+      text-align: right;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    button {
+      padding: 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: #fff;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .nav-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      z-index: 1000;
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-buttons">
+    <button onclick="switchPage('calculatorPage')">Profit Calculator</button>
+    <button onclick="switchPage('paymentPage')">BOQ Calculator</button>
+  </div>
+
+  <!-- Calculator Page -->
+  <div id="calculatorPage" class="page active">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: auto;
+        }
+        h2 {
+            color: white;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: white;
+        }
+    </style>
+    <script>
+        function calculateProfit() {
+            let charcoalBags = parseFloat(document.getElementById('charcoalBags').value);
+            let unitPriceCharcoal = parseFloat(document.getElementById('unitPriceCharcoal').value);
+            let unitPriceGas = parseFloat(document.getElementById('unitPriceGas').value);
+            let stovePrice = parseFloat(document.getElementById('stovePrice').value);
+            
+            if (isNaN(charcoalBags) || isNaN(unitPriceCharcoal) || isNaN(unitPriceGas)) {
+                alert("Please enter valid numbers.");
+                return;
+            }
+
+            let weeklyRevenue = charcoalBags * unitPriceCharcoal;
+            let equivalentGasUnits = charcoalBags / 2;
+            let weeklyGasCost = equivalentGasUnits * unitPriceGas;
+            let weeklyProfit = weeklyRevenue - weeklyGasCost;
+            
+            let monthlyProfit = weeklyProfit * 4;
+            let sixMonthsProfit = monthlyProfit * 6;
+            let yearlyProfit = weeklyProfit * 52;
+            let twoYearsProfit = yearlyProfit * 2;
+            let threeYearsProfit = yearlyProfit * 3;
+            
+            document.getElementById('weeklyProfit').innerText = "Weekly Profit: GHS " + weeklyProfit.toFixed(2);
+            document.getElementById('monthlyProfit').innerText = "Monthly Profit: GHS " + monthlyProfit.toFixed(2);
+            document.getElementById('sixMonthsProfit').innerText = "Six Months Profit: GHS " + sixMonthsProfit.toFixed(2);
+            document.getElementById('yearlyProfit').innerText = "Yearly Profit: GHS " + yearlyProfit.toFixed(2);
+            document.getElementById('twoYearsProfit').innerText = "Two Years Profit: GHS " + twoYearsProfit.toFixed(2);
+            document.getElementById('threeYearsProfit').innerText = "Three Years Profit: GHS " + threeYearsProfit.toFixed(2);
+            
+            if (!isNaN(stovePrice)) {
+                let sixMonthsAfterDeduction = sixMonthsProfit - stovePrice;
+                document.getElementById('sixMonthsAfterDeduction').innerText = "Six Months Profit (after stove cost): GHS " + sixMonthsAfterDeduction.toFixed(2);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Charcoal & Gas Profit Calculator</h2>
+        <label>Number of Charcoal Bags per Week:</label>
+        <input type="number" id="charcoalBags" />
+        
+        <label>Unit Price per Charcoal Bag (GHS):</label>
+        <input type="number" id="unitPriceCharcoal" />
+        
+        <label>Unit Price of Gas (GHS):</label>
+        <input type="number" id="unitPriceGas" />
+        
+        <label>Stove Price (GHS):</label>
+        <input type="number" id="stovePrice" />
+        
+        <button class="btn" onclick="calculateProfit()">Calculate Profit</button>
+        
+        <hr><div class="result" id="weeklyProfit">Weekly Profit: </div>
+        <div class="result" id="monthlyProfit">Monthly Profit: </div>
+        <div class="result" id="sixMonthsProfit">Six Months Profit: </div><hr>
+        <div class="result" id="yearlyProfit">Yearly Profit: </div>
+        <div class="result" id="twoYearsProfit">Two Years Profit: </div>
+        <div class="result" id="threeYearsProfit">Three Years Profit: </div><hr>
+        <div class="result" id="sixMonthsAfterDeduction">Six Months Profit (after stove cost): </div><hr>
+    </div>
+  </div>
+
+  <!-- Payment Info Page -->
+  <div id="paymentPage" class="page">
+             <style>
+        .container { width: 350px; margin: auto; background: #333; padding: 20px; border-radius: 10px; color: white; }
+        .display { background: black; color: white; padding: 15px; font-size: 24px; border-radius: 5px; margin-bottom: 10px; }
+        .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .product { display: flex; align-items: center; justify-content: space-between; background: blue; color: white; padding: 10px; border-radius: 5px; cursor: pointer; }
+        .clear-btn, .clear-all-btn, .boq-btn { padding: 10px; margin-top: 10px; border-radius: 5px; cursor: pointer; }
+        .clear-btn { background: orange; }
+        .clear-all-btn { background: red; }
+        .boq-btn { background: green; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5); }
+        .modal h2, .modal p { color: black; }
+        .modal button { margin-top: 10px; padding: 10px; cursor: pointer; }
+        @media print {
+    body * {
+        visibility: hidden;
+    }
+.modal, h2, .modal p {visibility: visible;}
+span {visibility: visible;}
+strong {visibility: visible;}
+hr {visibility: visible;}
+    .modal button {
+        display: none;
+    }
+}
+
+    </style>
+    <div class="container">
+        <div class="display" id="total">GHC 0.00</div>
+        <div class="button-grid" id="buttons"></div>
+        <button class="clear-all-btn" onclick="clearAll()">Clear All</button>
+        <button class="clear-btn" onclick="clearLast()">Clear Last</button>
+        <button class="boq-btn" onclick="showBOQ()">Show BOQ</button>
+    </div>
+    
+    <div class="modal" id="boqModal">
+        <h2>Envirofit Ghana</h2>
+        <p><strong>Account Name:</strong> Dorothy Wobie Akwele</p>
+        <p><strong>Account Number:</strong> 0556192531</p>
+        <p><strong>Account Network:</strong> MTN</p>
+        <hr>
+        <p><strong>Grand Total:</strong> GHC <span id="grandTotal">0.00</span></p>
+        <p><strong>6 Monthly Payments:</strong> GHC <span id="monthly">0.00</span></p>
+        <p><strong>24 Weekly Payments:</strong> GHC <span id="weekly">0.00</span></p>
+        <button class="clear-all-btn" onclick="closeBOQ()">Close</button>
+        <button class="boq-btn" onclick="printBOQ()">Print</button>
+    </div>
+    
+    <script>
+        const prices = {
+            "Size 15 (Single)": 422.50,
+            "Size 15 (Double)": 630.50,
+            "Size 15 (3 in 1)": 812.50,
+            "Size 20 (Single)": 437.50,
+            "Size 20 (Angle)": 610.00,
+            "Size 10 (Double)": 585.00,
+            "Size 10 (4 in 1)": 937.50,
+            "High Pressure Hose": 6.00,
+            "Hose Clip": 1.00,
+            "High Pressure Regulator": 50.00,
+            "Manifold (PVC Pipe)": 30.00,
+            "Hose Splitter": 30.00,
+            "LPG - (14.5kg)": 290.00,
+            "LPG - (50kg)": 998.00
+        };
+
+        let totalAmount = 0;
+        let transactions = {};
+
+        function updateDisplay() {
+            totalAmount = Object.keys(transactions).reduce((sum, product) => sum + (prices[product] * transactions[product]), 0);
+            document.getElementById("total").innerText = `GHC ${totalAmount.toFixed(2)}`;
+        }
+
+        function handleQuantityChange(product, input) {
+            let quantity = parseInt(input.value, 10);
+            if (!isNaN(quantity) && quantity > 0) {
+                transactions[product] = quantity;
+            } else {
+                delete transactions[product];
+            }
+            updateDisplay();
+        }
+
+        function clearLast() {
+            if (Object.keys(transactions).length > 0) {
+                let lastProduct = Object.keys(transactions).pop();
+                delete transactions[lastProduct];
+                updateDisplay();
+                document.getElementById(lastProduct).value = "";
+            }
+        }
+
+        function clearAll() {
+            transactions = {};
+            document.querySelectorAll("input[type='number']").forEach(input => input.value = "");
+            updateDisplay();
+        }
+
+        function showBOQ() {
+            document.getElementById("grandTotal").innerText = totalAmount.toFixed(2);
+            document.getElementById("monthly").innerText = (totalAmount / 6).toFixed(2);
+            document.getElementById("weekly").innerText = (totalAmount / 24).toFixed(2);
+            document.getElementById("boqModal").style.display = "block";
+        }
+
+        function closeBOQ() {
+            document.getElementById("boqModal").style.display = "none";
+            location.reload();
+        }
+
+        function printBOQ() {
+            let buttons = document.querySelectorAll(".modal button");
+            buttons.forEach(button => button.style.display = "none");
+            window.print();
+            buttons.forEach(button => button.style.display = "");
+        }
+
+        const buttonContainer = document.getElementById("buttons");
+        Object.keys(prices).forEach(product => {
+            let div = document.createElement("div");
+            div.className = "product";
+            div.innerText = product;
+            
+            let input = document.createElement("input");
+            input.type = "number";
+            input.min = "1";
+            input.id = product;
+            input.oninput = () => handleQuantityChange(product, input);
+            
+            div.appendChild(input);
+            buttonContainer.appendChild(div);
+        });
+    </script>
+  </div>
+
+  <script>
+    function switchPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    function appendNumber(number) {
+      let display = document.getElementById('display');
+      if (display.innerText === "GHC 0.00") {
+        display.innerText = `GHC ${number}`;
+      } else {
+        display.innerText += number;
+      }
+    }
+
+    function clearDisplay() {
+      document.getElementById('display').innerText = "GHC 0.00";
+    }
+
+    function calculateTotal() {
+      let display = document.getElementById('display');
+      let value = display.innerText.replace("GHC ", "");
+      let total = parseFloat(value) * 1.2; 
+      display.innerText = `GHC ${total.toFixed(2)}`;
+    }
+
+    function closePopup() {
+      document.getElementById('paymentPage').classList.remove('active');
+      switchPage('calculatorPage');
+    }
+  </script>
+
+</body>
+</html>
