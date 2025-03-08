@@ -179,13 +179,10 @@
             let twoYearsProfit = yearlyProfit * 2;
             let threeYearsProfit = yearlyProfit * 3;
             
-            document.getElementById('weeklyProfit').innerText = "Weekly Profit: GHS " + weeklyProfit.toFixed(2);
-            document.getElementById('monthlyProfit').innerText = "Monthly Profit: GHS " + monthlyProfit.toFixed(2);
-            document.getElementById('sixMonthsProfit').innerText = "Six Months Profit: GHS " + sixMonthsProfit.toFixed(2);
-            document.getElementById('yearlyProfit').innerText = "Yearly Profit: GHS " + yearlyProfit.toFixed(2);
-            document.getElementById('twoYearsProfit').innerText = "Two Years Profit: GHS " + twoYearsProfit.toFixed(2);
-            document.getElementById('threeYearsProfit').innerText = "Three Years Profit: GHS " + threeYearsProfit.toFixed(2);
-            
+            document.getElementById('weeklyProfit').innerText = "Weekly Savings: GHS " + weeklyProfit.toFixed(2);
+            document.getElementById('monthlyProfit').innerText = "Monthly Savings: GHS " + monthlyProfit.toFixed(2);
+            document.getElementById('yearlyProfit').innerText = "Yearly Savings: GHS " + yearlyProfit.toFixed(2);
+          
             if (!isNaN(stovePrice)) {
                 let sixMonthsAfterDeduction = sixMonthsProfit - stovePrice;
                 document.getElementById('sixMonthsAfterDeduction').innerText = "Six Months Profit (after stove cost): GHS " + sixMonthsAfterDeduction.toFixed(2);
@@ -212,10 +209,7 @@
         
         <hr><div class="result" id="weeklyProfit">Weekly Saving: </div>
         <div class="result" id="monthlyProfit">Monthly Saving: </div>
-        <div class="result" id="sixMonthsProfit">Six Months Saving: </div><hr>
         <div class="result" id="yearlyProfit">Yearly Saving: </div>
-        <div class="result" id="twoYearsProfit">Two Years Saving: </div>
-        <div class="result" id="threeYearsProfit">Three Years Saving: </div><hr>
         <div class="result" id="sixMonthsAfterDeduction">Six Months Saving (after stove cost): </div><hr>
     </div>
   </div>
