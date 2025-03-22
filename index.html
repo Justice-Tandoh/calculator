@@ -102,8 +102,9 @@
   <img src="envi.png" alt="Calculator Logo" width="150">
 
   <div class="nav-buttons">
-    <button onclick="switchPage('calculatorPage')">Savings Calculator</button>
-    <button onclick="switchPage('paymentPage')">BOQ Calculator</button>
+    <button onclick="switchPage('calculatorPage')">Savings</button>
+    <button onclick="switchPage('recomendation')">Recommend Stove</button>
+    <button onclick="switchPage('boq')">BOQ</button>
   </div>
 
   <!-- Calculator Page -->
@@ -238,7 +239,7 @@ button:hover {
   </div>
 
   <!-- Payment Info Page -->
-  <div id="paymentPage" class="page">
+  <div id="boq" class="page">
              <style>
         .container { width: 350px; margin: auto; background: #333; padding: 20px; border-radius: 10px; color: white; }
         .display { background: black; color: white; padding: 15px; font-size: 24px; border-radius: 5px; margin-bottom: 10px; }
@@ -270,7 +271,6 @@ hr {visibility: visible;}
         <div class="display" id="total">GHC 0.00</div>
         <div class="button-grid" id="buttons"></div>
         <button class="clear-all-btn" onclick="clearAll()">Clear All</button>
-        <button class="clear-btn" onclick="clearLast()">Clear Last</button>
         <button class="boq-btn" onclick="showBOQ()">Show BOQ</button>
     </div>
     
@@ -281,8 +281,8 @@ hr {visibility: visible;}
         <p><strong>Account Network:</strong> MTN</p>
         <hr>
         <p><strong>Grand Total:</strong> GHC <span id="grandTotal">0.00</span></p>
-        <p><strong>6 Monthly Payments:</strong> GHC <span id="monthly">0.00</span></p>
-        <p><strong>24 Weekly Payments:</strong> GHC <span id="weekly">0.00</span></p>
+        <p><strong>Monthly Payments:</strong> GHC <span id="monthly">0.00</span></p>
+        <p><strong>Weekly Payments:</strong> GHC <span id="weekly">0.00</span></p>
         <button class="clear-all-btn" onclick="closeBOQ()">Close</button>
         <button class="boq-btn" onclick="printBOQ()">Print</button>
     </div>
@@ -374,7 +374,134 @@ hr {visibility: visible;}
         });
     </script>
   </div>
+    <div id="recomendation" class="page">
+    <title>Stove Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            max-width: 600px;
+            margin: auto;
+            margin-top: 50px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 
+<div class="container">
+    <h2 class="text-center">Stove Recommendation</h2>
+
+    <div class="card">
+        <div class="mb-3">
+            <label for="potSize" class="form-label"><b>Enter Pot Size:</b></label>
+            <input type="number" id="potSize" class="form-control" placeholder="e.g. 15, 20, 25" min="1">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><b>Is this for heavy stiring  (requires heavy stirring)?</b></label>
+            <select id="heavyCooking" class="form-control">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </select>
+        </div>
+
+        <button class="btn btn-success mb-3" onclick="addPot()">Add Pot</button>
+
+        <h5>Selected Pots:</h5>
+        <ul id="potList" class="list-group mb-3"></ul>
+
+        <button class="btn btn-primary w-100" onclick="recommendStove()">Recommend Stove</button>
+
+        <div id="result" class="alert alert-info mt-4 d-none"></div>
+    </div>
+</div>
+
+<script>
+    let pots = [];
+
+    function addPot() {
+        let potSize = parseInt(document.getElementById("potSize").value);
+        let heavyCooking = document.getElementById("heavyCooking").value;
+
+        if (!isNaN(potSize) && potSize > 0) {
+            pots.push({ size: potSize, heavy: heavyCooking });
+            updatePotList();
+        } else {
+            alert("Enter a valid pot size!");
+        }
+    }
+
+    function updatePotList() {
+        let potList = document.getElementById("potList");
+        potList.innerHTML = "";
+        pots.forEach((pot, index) => {
+            let listItem = document.createElement("li");
+            listItem.className = "list-group-item d-flex justify-content-between";
+            listItem.innerHTML = `Pot ${index + 1}: Size ${pot.size}, Heavy stiring : ${pot.heavy.toUpperCase()} 
+                <button class="btn btn-danger btn-sm" onclick="removePot(${index})">X</button>`;
+            potList.appendChild(listItem);
+        });
+    }
+
+    function removePot(index) {
+        pots.splice(index, 1);
+        updatePotList();
+    }
+
+    function recommendStove() {
+        let resultDiv = document.getElementById("result");
+
+        if (pots.length === 0) {
+            resultDiv.classList.remove("d-none", "alert-success");
+            resultDiv.classList.add("alert-danger");
+            resultDiv.innerHTML = "Please add at least one pot.";
+            return;
+        }
+
+        pots.sort((a, b) => b.size - a.size); // Sort pots in descending order
+
+        let recommendations = [];
+        let availablePots = [...pots];
+
+        let pots15 = availablePots.filter(p => p.size === 15 && p.heavy === "no");
+        let potsOther = availablePots.filter(p => p.size !== 15 || p.heavy === "yes");
+
+        // ** Handle Triple Size 15 **
+        if (pots15.length >= 2 && pots15.length <= 3) {
+            recommendations.push(`Triple Size 15 (for pots: ${pots15.slice(0, 3).map(p => p.size).join(", ")})`);
+            pots15.splice(0, 3);
+        }
+
+        // ** Handle Double Size 15 **
+        if (pots15.length >= 2) {
+            recommendations.push(`Double Size 15 (for pots: ${pots15.slice(0, 2).map(p => p.size).join(", ")})`);
+            pots15.splice(0, 2);
+        }
+
+        // ** Handle remaining 15 pots **
+        pots15.forEach(pot => {
+            recommendations.push(`Single Size 15 (for pot: ${pot.size})`);
+        });
+
+        // ** Handle Single Size 20 Angle (Heavy stiring ) **
+        potsOther.forEach(pot => {
+            if (pot.heavy === "yes") {
+                recommendations.push(`Single Size 20 Angle (for heavy stiring - Pot ${pot.size})`);
+            } else {
+                recommendations.push(`Single Size 20 (for pot: ${pot.size})`);
+            }
+        });
+
+        // Display recommendations
+        resultDiv.classList.remove("d-none", "alert-danger");
+        resultDiv.classList.add("alert-success");
+        resultDiv.innerHTML = `<strong>Recommended Stoves:</strong><br>` + recommendations.join("<br>");
+    }
+</script>
+      </div>
   <script>
     function switchPage(pageId) {
       document.querySelectorAll('.page').forEach(page => {
@@ -404,10 +531,46 @@ hr {visibility: visible;}
     }
 
     function closePopup() {
-      document.getElementById('paymentPage').classList.remove('active');
+      document.getElementById('boq').classList.remove('active');
       switchPage('calculatorPage');
     }
   </script>
+<script>
+  function switchPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+
+      // Show the selected page
+      document.getElementById(pageId).classList.add('active');
+
+      // Save the current page to localStorage
+      localStorage.setItem('activePage', pageId);
+  }
+
+  // Restore the last visited page on page load
+  document.addEventListener("DOMContentLoaded", function() {
+      let lastPage = localStorage.getItem('activePage') || 'calculatorPage'; // Default to calculatorPage
+      switchPage(lastPage);
+  });
+</script>
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    width: 90%;
+    max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+</style>
 
 </body>
 </html>
