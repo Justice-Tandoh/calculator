@@ -451,55 +451,79 @@ hr {visibility: visible;}
         updatePotList();
     }
 
-    function recommendStove() {
-        let resultDiv = document.getElementById("result");
+function recommendStove() {
+    let resultDiv = document.getElementById("result");
 
-        if (pots.length === 0) {
-            resultDiv.classList.remove("d-none", "alert-success");
-            resultDiv.classList.add("alert-danger");
-            resultDiv.innerHTML = "Please add at least one pot.";
-            return;
-        }
-
-        pots.sort((a, b) => b.size - a.size); // Sort pots in descending order
-
-        let recommendations = [];
-        let availablePots = [...pots];
-
-        let pots15 = availablePots.filter(p => p.size === 15 && p.heavy === "no");
-        let potsOther = availablePots.filter(p => p.size !== 15 || p.heavy === "yes");
-
-        // ** Handle Triple Size 15 **
-        if (pots15.length >= 2 && pots15.length <= 3) {
-            recommendations.push(`Triple Size 15 (for pots: ${pots15.slice(0, 3).map(p => p.size).join(", ")})`);
-            pots15.splice(0, 3);
-        }
-
-        // ** Handle Double Size 15 **
-        if (pots15.length >= 2) {
-            recommendations.push(`Double Size 15 (for pots: ${pots15.slice(0, 2).map(p => p.size).join(", ")})`);
-            pots15.splice(0, 2);
-        }
-
-        // ** Handle remaining 15 pots **
-        pots15.forEach(pot => {
-            recommendations.push(`Single Size 15 (for pot: ${pot.size})`);
-        });
-
-        // ** Handle Single Size 20 Angle (Heavy stiring ) **
-        potsOther.forEach(pot => {
-            if (pot.heavy === "yes") {
-                recommendations.push(`Single Size 20 Angle (for heavy stiring - Pot ${pot.size})`);
-            } else {
-                recommendations.push(`Single Size 20 (for pot: ${pot.size})`);
-            }
-        });
-
-        // Display recommendations
-        resultDiv.classList.remove("d-none", "alert-danger");
-        resultDiv.classList.add("alert-success");
-        resultDiv.innerHTML = `<strong>Recommended Stoves:</strong><br>` + recommendations.join("<br>");
+    if (pots.length === 0) {
+        resultDiv.classList.remove("d-none", "alert-success");
+        resultDiv.classList.add("alert-danger");
+        resultDiv.innerHTML = "Please add at least one pot.";
+        return;
     }
+
+    // 🔥 CALCULATE LOAD
+    let totalLoad = 0;
+    let maxPot = 0;
+    let heavyCount = 0;
+
+    pots.forEach(pot => {
+        totalLoad += 1; // each pot = 1 load
+        if (pot.heavy === "yes") {
+            totalLoad += 1; // heavy adds extra load
+            heavyCount++;
+        }
+        if (pot.size > maxPot) maxPot = pot.size;
+    });
+
+    // 🔥 SCALING BURNER SYSTEM
+    let burner = "";
+
+    if (totalLoad <= 3) burner = "Single Burner";
+    else if (totalLoad <= 6) burner = "Double Burner";
+    else if (totalLoad <= 10) burner = "Triple Burner";
+    else {
+        let triples = Math.floor(totalLoad / 5);
+        let singles = totalLoad % 5;
+
+        let parts = [];
+
+        if (triples > 0) parts.push(triples + " Triple Burner");
+        if (singles > 0) parts.push(singles + " Single Burner");
+
+        burner = parts.join(" + ");
+    }
+
+    // 🔥 SIZE LOGIC (based on biggest pot)
+    let size = "";
+    if (maxPot <= 30) size = "(Size 20)";
+    else if (maxPot <= 60) size = "(Size 25)";
+    else size = "(Large Custom Size)";
+
+    // 🔥 HEIGHT LOGIC
+    let height = "";
+    if (burner.includes("Triple")) {
+        height = "- High and Low respectively";
+    } else {
+        height = heavyCount > 0 ? "- High" : "- Low";
+    }
+
+    // 🔥 FINAL OUTPUT
+    let final = `${burner} ${size} ${height}`;
+
+    resultDiv.classList.remove("d-none", "alert-danger");
+    resultDiv.classList.add("alert-success");
+
+    resultDiv.innerHTML = `
+        <strong>Recommended Stove:</strong><br><br>
+        ${final}
+        <hr>
+        <small>
+        Total Load: ${totalLoad} <br>
+        Largest Pot: ${maxPot} <br>
+        Heavy Cooking Pots: ${heavyCount}
+        </small>
+    `;
+}
 </script>
       </div>
   <script>
