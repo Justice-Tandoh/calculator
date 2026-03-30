@@ -167,8 +167,6 @@ button:hover {
 }
 
     </style>
-</head>
-<body>
     <div class="container">
         <h2>Savings Calculator</h2>
         <label for="bags">Bags of Charcoal per Week:</label>
@@ -487,9 +485,8 @@ function recommendStove() {
 
         let parts = [];
 
-        if (triples > 0) parts.push(triples + " Triple Burner");
-        if (singles > 0) parts.push(singles + " Single Burner");
-
+if (triples > 0) parts.push(triples + (triples > 1 ? " Triple Burners" : " Triple Burner"));
+if (singles > 0) parts.push(singles + (singles > 1 ? " Single Burners" : " Single Burner"));
         burner = parts.join(" + ");
     }
 
@@ -527,13 +524,6 @@ function recommendStove() {
 </script>
       </div>
   <script>
-    function switchPage(pageId) {
-      document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-      });
-      document.getElementById(pageId).classList.add('active');
-    }
-
     function appendNumber(number) {
       let display = document.getElementById('display');
       if (display.innerText === "GHC 0.00") {
